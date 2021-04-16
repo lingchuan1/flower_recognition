@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="file"  id="myFile1"/>
+<img src="" id="preview_img" width="400px" height="400px" alt="">
+
+<!--import jquery-->
+<script src="/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+<script>
+
+    $("#myFile1").change(function () {
+        //创建blob对象，浏览器将文件放入内存中，并生成标识
+        var img_src = URL.createObjectURL($(this)[0].files[0]);
+        //给img标检的src赋值
+        document.getElementById("preview_img").src=img_src;
+        //URL.revokeObjectURL(img_src);// 手动 回收，
+    });
+</script>
+</body>
+</html>

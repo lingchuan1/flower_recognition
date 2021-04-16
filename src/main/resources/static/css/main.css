@@ -1,0 +1,48 @@
+body{
+    background-image: url("/img/b.jpg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-attachment: fixed;
+}
+
+.main{
+    position:absolute;
+    width: 600px;
+    height: auto;
+    top:10px;
+    left:50%;
+    transform: translateX(-50%);
+}
+
+.imageupload {
+    margin: 10px 0;
+}
+
+.res {
+    padding-top: 20px;
+}
+
+#imageFile{
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.form label{
+    font-size: 20px;
+    width:120px;
+    height:45px;
+    line-height: 45px;
+    text-align: center;
+    color: white;
+    background-color: #93DF49;
+    display: inline-block;
+}
+
+#upload{
+    background-color: #93DF49;
+    background-image: linear-gradient(to bottom, #A1F054 0, #93DF49 100%)
+}

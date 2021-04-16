@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>识花系统</title>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link th:href="@{css/main.css}" rel="stylesheet"/>
+    <link th:href="@{bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{bootstrap/css/bootstrap-theme.min.css}" rel="stylesheet"/>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+</head>
+
+<body>
+<div class="main">
+    <div class="form">
+        <div class="imageupload panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title" align="center">识别花卉</h2>
+            </div>
+            <div class="file-tab panel-body">
+                <input id="imageFile" type="file" accept="image/*"/>
+                <label for="imageFile">选择文件</label>
+            </div>
+            <div id="canvas" class="panel-body">
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <button id="upload" type="button" class="btn btn-block btn-primary">识别</button>
+    </div>
+
+    <div class="res" style="display: none">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title" align="center">识别结果</h3>
+            </div>
+            <div class="panel-body">
+                <div style="width:300px; float:left">
+                    <a class="link" target="_blank" href="https://baike.baidu.com/item/%E5%90%91%E6%97%A5%E8%91%B5"><h3 class="name">
+                        <span class="label label-default">蒲公英</span></h3></a>
+                    <p class="enName">dandelion</p>
+                    <p style="color: red;" class="confidence">31%置信度</p>
+                    <img class="image" src="/img/1.jpg"/>
+                </div>
+                <div class="details" style="width:250px;float:left;font-size:18px">
+
+                    蒲公英为多年生草本植物，花茎是空心的，折断之后有白色的乳汁。匙形或狭长倒卵形的叶子呈莲座状平铺，羽状浅裂或齿裂。
+
+                    春季花期为4至5月，秋季花期为8至9月。蒲公英头状花序，种子上有白色冠毛结成的绒球，花开之后随风飘到新的地方孕育新生命。
+
+                    冬末春初抽花茎，顶端生一头状花序。花为亮黄色，由很多细花瓣组成。果实成熟之后，形似一白色绒球，成一朵圆的蒲公英伞，被风吹过会分为带着一粒种子的小白伞。
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--import jquery-->
+<script th:src="@{js/jquery-3.2.1.min.js}" type="text/javascript"></script>
+<!--图片本地压缩处理-->
+<script th:src="@{js/LocalResizeIMG.js}"></script>
+<!--mobileBUGFix.js 兼容修复移动设备-->
+<script th:src="@{js/mobileBUGFix.mini.js}"></script>
+<!--import bootstrap.js-->
+<script th:src="@{bootstrap/js/bootstrap.min.js}" type="text/javascript"></script>
+<script type="text/javascript">
+    //图片数据
+    var img;
+
+    //将上传的图片进行本地压缩处理，并且使用canvas呈现出来
+    $("#imageFile").localResizeIMG({
+        width: 100,
+        quality: 1,
+        success: function (result) {
+            //清空canvas画布图片区
+            $("#canvas").empty();
+            handleUpload(result);
+        }
+    });
+
+    function handleUpload(result) {
+        //本地压缩后的图片数据
+        var imgData = result.clearBase64;
+        //上传图片的名称
+        var imgName = result.imgName;
+
+        //构造图片对象
+        img = Img(imgData, imgName);
+
+        //构造Image对象,在页面上显示出图片
+        var image = new Image();
+        image.src = result.base64;
+        //使用追加的方式在canvas画布上显示图片
+        $("#canvas").append(image);
+    }
+
+    /**
+     * 定义img对象
+     * @param imgData 图片压缩数据
+     * @param imgName 图片上传名称
+     * @returns {Object}
+     * @constructor
+     */
+    function Img(imgData, imgName) {
+        var img = new Object();
+        img.imgData = imgData;
+        img.imgName = imgName;
+        img.getImgData = function () {
+            return this.imgData;
+        }
+        img.getImgName = function () {
+            return this.imgName;
+        }
+        return img;
+    }
+
+    //执行上传操作，并且提交到服务器进行处理
+    $("#upload").click(function () {
+        if (img == null) {
+            alert("请选择图片...");
+            return;
+        }
+
+
+        $.ajax({
+            url: "/picture/upload",
+            type: "post",
+            data: JSON.stringify(img),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                if (data.code == 0) {
+                    console.log("============上传图片成功...");
+                    console.log(data.data);
+                    $(".name").text(data.data.floName);
+                    $(".enName").text(data.data.floEnName);
+                    $(".details").html(data.data.floDetails);
+                    $(".confidence").text(data.data.floConfidence.toString() + "%置信度");
+                    $(".image").attr('src', data.data.floImg);
+                    $(".link").attr('href', data.data.floLink);
+                    $(".res").show();
+
+                } else {
+                    console.log("。。。");
+                }
+            },
+            error: function () {
+                console.log("============上传图片失败...")
+            }
+        });
+    });
+</script>
+</body>
+</html>
